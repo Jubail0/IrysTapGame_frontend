@@ -1,7 +1,6 @@
 import React, { use } from "react";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import './index.css';
 import Navbar from "./Components/Navbar.jsx";
 import Footer from "./Components/Footer.jsx";
 import GamePage from "./Pages/GamePage.jsx";
