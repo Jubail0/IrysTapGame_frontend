@@ -39,7 +39,7 @@ const GuidePage = () => {
       {
   id: 6,
   title: "6. Earn Future Rewards",
-  desc: "Players who evolve their NFT to Stage 3 will qualify for future rewards.",
+  desc: "Players who evolve their NFT to Stage 4 will qualify for future rewards.",
   icon: <Database size={40} className="text-[#6676F2]" />,
 },
 
