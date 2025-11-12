@@ -15,7 +15,7 @@ export const useUserStore = create(
         
         try {
           set({ loading: true, error: null });
-          const res = await api.get(`/profile/${walletAddress}`);
+          const res = await api.get(`/api/profile/${walletAddress}`);
           set({ user: res.data.user, loading: false });
           // notifySuccess("User data loaded!");
         } catch (err) {
@@ -30,7 +30,7 @@ export const useUserStore = create(
       const {fetchUserNft, user} = useNFTStore.getState()
         try {
           set({ loading: true, error: null });
-          const res = await api.post("/auth/connect-wallet", { walletAddress });
+          const res = await api.post("/api/auth/connect-wallet", { walletAddress });
             set({
              user: res.data.user,
              loading: false
@@ -57,7 +57,7 @@ export const useUserStore = create(
     set({ loading: true });
 
     // ✅ Send directly to backend upload route
-    const res = await api.put("/profile/update",formData, {
+    const res = await api.put("/api/profile/update",formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
