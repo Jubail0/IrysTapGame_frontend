@@ -260,8 +260,8 @@ const GameSection = () => {
 
                     <button
                       onClick={() => {
-                        const text = `⚡ I just scored ${score} in Tap Royale in 30 seconds! Can you beat me? #TapRoyale #IrysNetwork`;
-                        const url = encodeURIComponent("https://taproyale.irys.xyz");
+                        const text = `⚡ I just scored ${score} in Tap Royale in 30 seconds! Can you beat me? #TapRoyale`;
+                        const url = encodeURIComponent("https://tap-royale.xyz");
                         window.open(
                           `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`,
                           "_blank"
