@@ -32,14 +32,14 @@ const GuidePage = () => {
   {
       id: 5,
       title: "5. Evolve Your NFT",
-      desc: "Your NFT evolves when you reach score milestones 100, 200, and 300. Each evolution brings new visuals and recognition.",
+      desc: "Your NFT evolves when you reach score milestones. Each evolution brings new visuals and recognition.",
       icon: <Trophy size={40} className="text-[#FACC15]" />,
     },
 
       {
   id: 6,
   title: "6. Earn Future Rewards",
-  desc: "Players who evolve their NFT to Stage 3 will become eligible for exclusive prizes and future rewards.",
+  desc: "Players who evolve their NFT to Stage 3 will qualify for future rewards.",
   icon: <Database size={40} className="text-[#6676F2]" />,
 },
 
