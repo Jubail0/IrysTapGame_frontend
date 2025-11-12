@@ -6,36 +6,23 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { irysTestnet } from "../config/irysChain";
 import { notifySuccess, notifyError } from "../Utils/notify";
 import { Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
   const { loginUser, logout, user } = useUserStore();
   const { address, isConnected, status } = useAccount();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
-
   const [menuOpen, setMenuOpen] = useState(false);
-  const [hasDisconnected, setHasDisconnected] = useState(false);
   const menuRef = useRef(null);
 
-  // Handle wallet connection changes
   useEffect(() => {
     const handleWalletChange = async () => {
-      // User disconnected
-      if (!isConnected && user?.walletAddress) {
-        logout();
-        setHasDisconnected(true);
-        return;
-      }
+      if (status !== "connected" && status !== "disconnected") return;
 
-      // If user manually disconnected, do not auto login
-      if (isConnected && hasDisconnected) return;
-
-      // If wallet connected
       if (isConnected && address) {
-        if (user?.walletAddress === address) return; // Already logged in
+        if (user?.walletAddress === address) return;
 
-        // Switch chain if needed
         if (chainId !== irysTestnet.id) {
           try {
             await switchChainAsync?.({ chainId: irysTestnet.id });
@@ -47,7 +34,8 @@ function Navbar() {
         }
 
         loginUser(address);
-        setHasDisconnected(false); // Reset disconnect flag
+      } else if (!isConnected && user?.walletAddress) {
+        logout();
       }
     };
 
@@ -114,7 +102,7 @@ function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Super Smooth Mobile Dropdown */}
       <div
         ref={menuRef}
         className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
