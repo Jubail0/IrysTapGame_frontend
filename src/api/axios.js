@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api", // adjust port if needed
+  baseURL: import.meta.env.VITE_BACKEND_URL, // adjust port if needed
   withCredentials: false, // set true only if using cookies/session
   headers: {
     "Content-Type": "application/json",

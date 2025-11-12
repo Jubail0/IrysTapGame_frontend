@@ -78,7 +78,7 @@ const MintNftModal = ({ onClose, onSuccess }) => {
 
     // 🧾 Step 4 — Get metadata from backend
     const metadataResponse = await safeApiCall(() =>
-      api.post("/nft/mint", { walletAddress: address })
+      api.post("/api/nft/mint", { walletAddress: address })
     );
 
     if (!metadataResponse?.metadataUrl || !metadataResponse?.rootTxId) {
@@ -138,7 +138,7 @@ const MintNftModal = ({ onClose, onSuccess }) => {
 
     // 🧠 Step 8 — Notify backend (only after confirmed success)
     await safeApiCall(() =>
-      api.post("/nft/mint-success", {
+      api.post("/api/nft/mint-success", {
         walletAddress: address,
         nftMinted: true,
         nftMetadataUrl: metadataUrl,

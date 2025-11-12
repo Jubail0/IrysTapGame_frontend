@@ -40,7 +40,7 @@ const MintNftSection = () => {
       setShowNftImage(nftPreviewImage);
       setLoadingImage(false);
     };
-  }, [nft]);
+  }, [nft, user]);
 
   // ✅ Step 4: Allow user to mint NFT
   const handleMintValidation = () => {
