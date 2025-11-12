@@ -11,7 +11,7 @@ export const useGameStore = create((set, get) => ({
   fetchRecentGames: async () => {
     try {
       
-      const res = await api.get("/public/recent");
+      const res = await api.get("/api/public/recent");
       set({ recentGames: res.data, loading: false });
       console.log("Recent games loaded!");
     } catch (error) {
@@ -25,7 +25,7 @@ export const useGameStore = create((set, get) => ({
     const walletAddress = useUserStore.getState().user?.walletAddress;
     set({ loading: true, error: null });
     try {
-        const res = await api.post('/game/save',{
+        const res = await api.post('/api/game/save',{
             walletAddress,
             score
         })
