@@ -51,7 +51,7 @@ const NftCard = ({ user, nft, fetchUserNft, theme }) => {
 
   const thresholds = import.meta.env.VITE_THRESHOLDS.split(",").map(Number);
   const canEvolve =
-    user?.bestScore >= thresholds[currentStage - 1] && currentStage < 4;
+    user?.totalScore >= thresholds[currentStage - 1] && currentStage < 4;
 
   return (
     <div
