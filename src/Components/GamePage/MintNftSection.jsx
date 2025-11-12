@@ -1,188 +1,143 @@
-import React, { useEffect, useState } from "react";
-import MintNftModal from "./MintModal";
-import { useUserStore } from "../../Store/useUserStore";
-import { useNFTStore } from "../../Store/useNftStore";
-import { useAccount } from "wagmi";
-import { notifyError } from "../../Utils/notify";
-import { Loader2 } from "lucide-react"; // 👈 loader icon
+import { useState, useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
+import { useUserStore } from "../Store/useUserStore";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { irysTestnet } from "../config/irysChain";
+import { notifySuccess, notifyError } from "../Utils/notify";
+import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const MintNftSection = () => {
-  const { isConnected, address } = useAccount();
-  const { user, refreshUserData } = useUserStore();
-  const { fetchUserNft, nft } = useNFTStore();
+function Navbar() {
+  const { loginUser, logout, user } = useUserStore();
+  const { address, isConnected, status } = useAccount();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  const [showMintModal, setShowMintModal] = useState(false);
-  const [showNftImage, setShowNftImage] = useState("");
-  const [loadingImage, setLoadingImage] = useState(true);
-
-  // ✅ Step 2: When user metadata URL is available, fetch NFT metadata
   useEffect(() => {
-    if (user?.nftMetadataUrl) {
-      fetchUserNft(user.nftMetadataUrl);
-    }
-  }, [user?.nftMetadataUrl]);
+    const handleWalletChange = async () => {
+      if (status !== "connected" && status !== "disconnected") return;
 
-  // ✅ Step 3: Handle NFT image display & loader
-  useEffect(() => {
-    const nftPreviewImage =
-      "https://uploader.irys.xyz/7VTcTZGZcEJ3u64rFHhr176rac2AMG9g8noEUgB6om73";
+      if (isConnected && address) {
+        if (user?.walletAddress === address) return;
 
-    setLoadingImage(true);
-    const newImage = nft?.image ? nft.image : nftPreviewImage;
+        if (chainId !== irysTestnet.id) {
+          try {
+            await switchChainAsync?.({ chainId: irysTestnet.id });
+            notifySuccess("Switched to Irys Testnet ✅");
+          } catch {
+            notifyError("Please switch to Irys Testnet manually!");
+            return;
+          }
+        }
 
-    const img = new Image();
-    img.src = newImage;
-    img.onload = () => {
-      setShowNftImage(newImage);
-      setLoadingImage(false);
+        loginUser(address);
+      } else if (!isConnected && user?.walletAddress) {
+        logout();
+      }
     };
-    img.onerror = () => {
-      setShowNftImage(nftPreviewImage);
-      setLoadingImage(false);
-    };
-  }, [nft, user]);
 
-  // ✅ Step 4: Allow user to mint NFT
-  const handleMintValidation = () => {
-    if (!isConnected) {
-      notifyError("Wallet connection required!");
-      return;
-    }
-    setShowMintModal(true);
-  };
+    handleWalletChange();
+  }, [isConnected, address, chainId, status]);
 
-  // ✅ Scroll to game section
-  const redirect_To_gameplay = () => {
-    const gameSection = document.getElementById("gameSectionInline");
-    if (gameSection) gameSection.scrollIntoView({ behavior: "smooth" });
-  };
+  const links = [
+    { path: "/", label: "Game" },
+    { path: "/how-it-works", label: "How It Works" },
+    { path: "/leaderboard", label: "Leaderboard" },
+  ];
+
+  if (user?.walletAddress) {
+    links.splice(1, 0, { path: "/profile", label: "Profile" });
+  }
 
   return (
-    <div
-      id="mintNftSection"
-      className="px-6 py-20 flex justify-center bg-[#f6f6f8] font-fredoka"
-    >
-      <div className="flex flex-col md:flex-row justify-between items-center gap-12 w-full max-w-6xl">
-        {/* Left: NFT Image & Stage */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center items-center text-center">
-         <div className="relative w-[400px] h-[400px] rounded-3xl overflow-hidden bg-linear-to-br from-[#faf9ff] to-[#ecebff] shadow-[0_15px_50px_rgba(124,66,240,0.25)] border border-[#E5E4F2] backdrop-blur-md">
-  {loadingImage ? (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/60">
-      <Loader2 className="animate-spin text-[#7C42F0]" size={44} />
-      <p className="text-sm font-medium">Loading NFT...</p>
-    </div>
-  ) : (
-    <img
-      src={showNftImage}
-      alt="NFT preview"
-      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-      style={{
-        filter: "contrast(1.1) brightness(1.05)",
-        imageRendering: "auto",
-      }}
-      loading="lazy"
-    />
-  )}
+    <nav className="w-full bg-[#FCFCFD] shadow-md px-4 py-4 relative z-50">
+      <div className="flex justify-between items-center">
+        {/* Logo */}
+        <NavLink
+          to="/"
+          className="text-2xl font-bold text-[#7C42F0] font-fredoka"
+        >
+          Tap Tap
+        </NavLink>
 
-  {/* ✨ Gloss overlay for an HD sheen effect */}
-  <div className="absolute inset-0 bg-linear-to-t from-transparent via-white/10 to-white/40 mix-blend-overlay pointer-events-none"></div>
-
-  {/* 🪞 Light reflection */}
-  <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white/40 via-transparent to-transparent opacity-30 mix-blend-screen pointer-events-none"></div>
-</div>
-
-
-          <div className="mt-4">
-            <span className="px-4 py-1 rounded-2xl border border-[#DDDDE4] bg-[#FCFCFD] text-[12px] text-gray-700 font-medium">
-              {user?.nftStage > 0 ? `Stage ${user?.nftStage}` : "Stage 1"}
-            </span>
-          </div>
+        {/* Desktop Links */}
+        <div className="hidden md:flex gap-6 items-center">
+          {links.map(({ path, label }) => (
+            <NavLink
+              key={path}
+              to={path}
+              className={({ isActive }) =>
+                `transition ${
+                  isActive
+                    ? "text-[#7C42F0] border-b-2 border-[#7C42F0] pb-1"
+                    : "text-[#22222a] hover:text-[#7C42F0]"
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
         </div>
 
-        {/* Right: Action Section */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center text-left">
-          <h1 className="text-3xl font-bold mb-4 text-gray-800">
-           { user?.nftMinted ? "Your NFT Journey" : "Royale NFT"}
-          </h1>
-          <h2 className="text-[16px] text-[#75758A] leading-normal font-inter mb-6">
-            {nft
-              ? nft?.description
-              : "Mint this NFT to begin your journey. Each game you play brings you closer to the ultimate form of the NFT and may qualify you for future rewards."}
-          </h2>
-
-          {/* Action Buttons */}
-          <div>
-            {user?.nftMinted ? (
-              <button
-                onClick={redirect_To_gameplay}
-                className="bg-linear-to-r from-[#7c42f0] to-[#3494f4] w-full md:w-[60%] cursor-pointer text-white px-6 py-3 rounded-xl font-semibold transition"
-              >
-                Start Tap Game
-              </button>
-            ) : (
-              <button
-                onClick={handleMintValidation}
-                className="w-full bg-[#7C42F0] cursor-pointer hover:bg-[#6a38d4] text-[#F6F6F8] px-8 py-4 rounded-xl font-semibold transition-transform transform hover:scale-105 shadow-md"
-              >
-                Mint NFT
-              </button>
-            )}
-
-            {/* Info Card */}
-            {user?.nftMinted && (
-              <div className="mt-6 p-4 border border-[#DDDDE4] rounded-xl bg-[#FCFCFD] flex flex-col gap-2 font-inter">
-                <div className="flex justify-between text-[14px]">
-                  <span>Token ID</span>
-                  <span>#{user?.tokenId}</span>
-                </div>
-                <div className="flex justify-between text-[14px]">
-                  <span>Minted on</span>
-                  <span>
-                    {new Date(user?.mintedDate)
-                      .toISOString()
-                      .slice(0, 16)
-                      .replace("T", " ")}{" "}
-                    UTC
-                  </span>
-                </div>
-              <div className="flex justify-between text-[14px]">
-  <span>tx hash</span>
-  <span>
-    {user?.mintTxHash ? (
-      <a
-        href={`https://explorer.irys.xyz/tx/${user.mintTxHash}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-500 hover:underline break-all"
-      >
-        {user.mintTxHash.slice(0, 6)}...{user.mintTxHash.slice(-6)}
-      </a>
-    ) : (
-      "-"
-    )}
-  </span>
-</div>
-
-              </div>
-            )}
-          </div>
+        {/* Wallet Button (Desktop) */}
+        <div className="hidden md:flex items-center">
+          <ConnectButton showBalance={true} chainStatus="icon" />
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden flex items-center text-[#7C42F0]"
+          onClick={() => setMenuOpen((p) => !p)}
+        >
+          <motion.div
+            initial={false}
+            animate={{ rotate: menuOpen ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+          </motion.div>
+        </button>
       </div>
 
-      {/* Mint Modal */}
-      {showMintModal && (
-        <MintNftModal
-          onClose={() => setShowMintModal(false)}
-          onSuccess={async () => {
-            await refreshUserData();
-            if (user?.nftMetadataUrl) {
-              await fetchUserNft(user?.nftMetadataUrl);
-            }
-          }}
-        />
-      )}
-    </div>
+      {/* Super Smooth Mobile Dropdown */}
+      <div
+        ref={menuRef}
+        className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${
+          menuOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: menuOpen ? 1 : 0, y: menuOpen ? 0 : -10 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="bg-white rounded-2xl shadow-lg mt-4 p-5 flex flex-col gap-5"
+        >
+          {links.map(({ path, label }) => (
+            <NavLink
+              key={path}
+              to={path}
+              onClick={() => setMenuOpen(false)}
+              className={({ isActive }) =>
+                `block transition ${
+                  isActive
+                    ? "text-[#7C42F0] border-b-2 border-[#7C42F0] pb-1"
+                    : "text-[#22222a] hover:text-[#7C42F0]"
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+          <div className="pt-3 border-t border-gray-200">
+            <ConnectButton showBalance={true} chainStatus="icon" />
+          </div>
+        </motion.div>
+      </div>
+    </nav>
   );
-};
+}
 
-export default MintNftSection;
+export default Navbar;
