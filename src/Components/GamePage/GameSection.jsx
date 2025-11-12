@@ -4,7 +4,11 @@ import Confetti from "react-confetti";
 import { useGameStore } from "../../Store/useGameStore";
 import Loader from "../Loader";
 import { useNavigate } from "react-router-dom";
+import { useAccount, useSignMessage } from "wagmi";
+
 const GameSection = () => {
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const [countdown, setCountdown] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -107,11 +111,13 @@ const GameSection = () => {
   };
 
    const handleSaveScore = async () => {
-  setScoreSaved(false);
-   await saveScore(score, setHandleSpam);
-   setScoreSaved(true); // mark as saved
-    
-    fetchRecentGames();
+   if (!isConnected || !address) return alert("Connect your wallet first");
+
+   setScoreSaved(false);
+   await saveScore(score, setHandleSpam, signMessageAsync); // pass signMessageAsync
+   setScoreSaved(true);
+
+   fetchRecentGames();
   };
 
   const tierMessage =
