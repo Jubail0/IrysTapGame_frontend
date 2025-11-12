@@ -46,7 +46,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchGamehistory = async () => {
       try {
-        const res = await api.get(`/profile/${user?.walletAddress}`);
+        const res = await api.get(`/api/profile/${user?.walletAddress}`);
         setGameHistory(
           res.data.gameHistory.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
