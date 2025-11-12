@@ -16,7 +16,7 @@ const NftCard = ({ user, nft, fetchUserNft, theme }) => {
     try {
       setIsEvolving(true);
 
-      const res = await api.post("/nft/evolve", {
+      const res = await api.post("/api/nft/evolve", {
         walletAddress: user.walletAddress,
       });
 
