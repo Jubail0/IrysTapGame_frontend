@@ -1,25 +1,41 @@
 // src/config/irysChain.js
 import { defineChain } from "viem";
 
+// 🔹 Your backend route (from .env)
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export const irysTestnet = defineChain({
-  id: 1270, // example chain ID, replace with actual Irys testnet chainId
+  id: 1270, // Irys Testnet Chain ID
   name: "Irys Testnet",
-  network: "Irys Testnet v1",
+  network: "irys-testnet",
+
   nativeCurrency: {
     name: "Irys Token",
     symbol: "IRYS",
     decimals: 18,
   },
+
   rpcUrls: {
     default: {
-      http: ["https://testnet-rpc.irys.xyz/v1/execution-rpc"], // 🔹 replace with your actual testnet RPC
+      http: [
+        // 🔹 Frontend will *NOT* call this directly
+        //     Backend will proxy RPC calls.
+        `${BACKEND_URL}/api/public/irys-rpc` 
+      ],
     },
     public: {
-      http: ["https://testnet-rpc.irys.xyz/v1/execution-rpc"],
+      http: [
+        `${BACKEND_URL}/api/public/irys-rpc`
+      ],
     },
   },
+
   blockExplorers: {
-    default: { name: "IrysScan", url: "https://explorer.irys.xyz" },
+    default: {
+      name: "IrysScan",
+      url: "https://explorer.irys.xyz",
+    },
   },
+
   testnet: true,
 });
